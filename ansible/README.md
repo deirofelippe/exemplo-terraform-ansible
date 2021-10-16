@@ -3,6 +3,7 @@
 1. `cd ansible`
 1. `ansible-playbook -i hosts main.yaml`
 1. digite a passphrase
+1. acesse a aplicação por um dos IPs do output do terraform
 
 ## Comandos
 
@@ -15,12 +16,12 @@
 
 Use os ips mostrados no output do terraform
 
-ips:
+IPs:
   134.122.21.160
   157.245.245.221
   157.245.243.118
 
-loadbalancer ip:
+Load Balancer IP:
    138.197.228.92
 
 1. `ssh-copy-id root@157.245.243.118`, caso a máquina remota não tenha a sua chave
