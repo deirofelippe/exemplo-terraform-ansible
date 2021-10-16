@@ -1,0 +1,56 @@
+---
+- name: Install Nginx, Node and NPM
+  apt: # vai rodar o modulo apt
+    pkg: # vai instalar os seguintes pacotes
+    - nginx
+    - nodejs
+    - npm
+    update_cache: yes # faz update no cache
+    state: present # os pacotes tem que estar presentes
+
+- name: Add nginx when system starts
+  service: # sobe no server por padrao, tipo systemctl
+    name: nginx
+    enabled: yes #habilita o nginx por padrao
+
+- name: Create dir /app
+  file: #cria um diretorio
+    path: /app
+    state: directory
+
+- name: Copy package.json
+  copy: 
+    src: package.json
+    dest: /app/package.json
+    
+- name: Copy index.js template
+  template: 
+    dest: /app/index.js
+    src: index.js.j2
+
+- name: Npm install
+  npm: 
+    path: /app
+    state: present
+
+- name: Copy app.service #subir o servico nodejs sem precisar digitar 'node index.js'
+  copy: 
+    src: app.service
+    dest: /etc/systemd/system/app.service
+
+- name: Make sure that app service is enabled
+  systemd: 
+    name: app
+    enabled: yes
+
+- name: Run app service
+  systemd: 
+    name: app
+    state: started
+
+- name: Copy default.conf #roda o node na porta 3000 e o nginx na porta 80, quando acessar o nginx, vai ser redirecionado pro node
+  template: 
+    dest: /etc/nginx/sites-available/default
+    src: nginx.conf.j2
+  notify: Reload nginx #toda vez que copiar o arquivo pra la, o vai fazer um reload no nginx. precisa reiniciar o nginx pra pegar as novas configuracoes
+
